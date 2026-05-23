@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: noppa
+      POSTGRES_USER: noppa
+      POSTGRES_PASSWORD: noppa_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - noppa_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U noppa -d noppa"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./be
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 3001
+      HOST: 0.0.0.0
+      DATABASE_URL: postgresql://noppa:noppa_password@postgres:5432/noppa?schema=public
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      MASTER_PROMPT: ${MASTER_PROMPT:-You build installable mobile-first PWA prototypes. Return one complete HTML document only, with inline CSS and JavaScript. Do not include markdown fences or explanation.}
+      CLAUDE_GENERATE_MODEL: ${CLAUDE_GENERATE_MODEL:-claude-sonnet-4-20250514}
+      CLAUDE_REFINE_MODEL: ${CLAUDE_REFINE_MODEL:-claude-3-5-haiku-20241022}
+    ports:
+      - "3001:3001"
+
+volumes:
+  noppa_postgres_data:

@@ -5,10 +5,18 @@
   "type": "module",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "dev": "node --watch src/server.js",
+    "db:push": "prisma db push",
+    "prisma:generate": "prisma generate"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.98.0",
+    "@prisma/client": "^6.19.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "express": "^5.1.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "prisma": "^6.19.3"
+  }
 }
